@@ -18,6 +18,22 @@
         p {
             color: #666;
         }
+
+        /* Chatbot styling */
+        .chatbot-container {
+            border: 1px solid #ccc;
+            padding: 10px;
+            max-width: 400px;
+            margin: 0 auto;
+            cursor: pointer;
+        }
+
+        .chatbot-content {
+            display: none;
+            padding: 10px;
+            background-color: #f7f7f7;
+            border: 1px solid #ccc;
+        }
     </style>
 </head>
 <body>
@@ -25,13 +41,38 @@
     <p>Welcome to my chatbot work page!</p>
     <p>This page demonstrates the functionality of a chatbot I developed.</p>
     <p>Feel free to interact with the chatbot and ask any questions you may have.</p>
-    <div id="chatbot-container">
-        <!-- Add your chatbot interface here -->
+
+    <!-- Chatbot container -->
+    <div class="chatbot-container">
+        Click here to chat with the bot
+        <div class="chatbot-content">
+            <!-- Chatbot interface goes here -->
+            <input type="text" id="chat-input" placeholder="Type your message" />
+            <button id="send-btn">Send</button>
+            <div id="chat-output"></div>
+        </div>
     </div>
 
-    <!-- Add your JavaScript code for the chatbot functionality -->
     <script>
-        // Your JavaScript code goes here
+        // Chatbot functionality
+        const chatbotContainer = document.querySelector('.chatbot-container');
+        const chatbotContent = document.querySelector('.chatbot-content');
+        const chatInput = document.getElementById('chat-input');
+        const chatOutput = document.getElementById('chat-output');
+        const sendButton = document.getElementById('send-btn');
+
+        chatbotContainer.addEventListener('click', function () {
+            chatbotContent.style.display = chatbotContent.style.display === 'none' ? 'block' : 'none';
+        });
+
+        sendButton.addEventListener('click', function () {
+            const userMessage = chatInput.value;
+            // Handle user message and generate chatbot response
+            const chatbotResponse = 'This is a sample chatbot response';
+            chatOutput.innerHTML += '<p><strong>User:</strong> ' + userMessage + '</p>';
+            chatOutput.innerHTML += '<p><strong>Chatbot:</strong> ' + chatbotResponse + '</p>';
+            chatInput.value = '';
+        });
     </script>
 </body>
 </html>
