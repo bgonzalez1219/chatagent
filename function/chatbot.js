@@ -2,7 +2,7 @@ const openai = require('openai');
 const fs = require('fs');
 
 // API Key
-const api_key = prompt("OpenAI API Key: ");
+const api_key = "YOUR_API_KEY"; // Replace with your actual API key
 
 // Set the API key if provided
 if (api_key) {
@@ -81,41 +81,21 @@ function get_bot_response(message, data1, data2) {
     }
 }
 
-while (true) {
-    // User input
-    const user_input = prompt("User Input: ");
+// Export the function to use as a Netlify Function
+exports.handler = async function (event, context) {
+    const { userInput, data1, data2 } = event.queryStringParameters;
 
     // Process user input and get bot response
-    const [bot_response, reasoning] = get_bot_response(user_input, data1, data2);
+    const [bot_response, reasoning] = get_bot_response(userInput, JSON.parse(data1), JSON.parse(data2));
 
-    // Display bot response
-    console.log("Bot Response:", bot_response);
+    // Prepare the response object
+    const response = {
+        statusCode: 200,
+        body: JSON.stringify({
+            botResponse: bot_response,
+            reasoning: reasoning
+        })
+    };
 
-    if (reasoning) {
-        // Button to show reasoning
-        const show_reasoning = prompt("Show Reasoning? (Y/N): ");
-
-        if (show_reasoning.toLowerCase() === "y") {
-            console.log("---");
-            console.log("Reasoning:");
-            console.log(reasoning);
-        }
-    }
-
-    // Button to show data information
-    const show_data_info = prompt("Show Data Information? (Y/N): ");
-
-    if (show_data_info.toLowerCase() === "y") {
-        console.log("---");
-        console.log("Data Information:");
-        if (Array.isArray(data1) && Array.isArray(data2)) {
-            console.log("data1.json:");
-            console.log(JSON.stringify(data1, null, 4));
-            console.log("data2.json:");
-            console.log(JSON.stringify(data2, null, 4));
-        } else {
-            console.log("Invalid data format for data1.json or data2.json");
-        }
-    }
-}
-
+    return response;
+};
