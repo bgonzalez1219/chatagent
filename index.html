@@ -53,30 +53,8 @@
     <p>Feel free to interact with the chatbot and ask any questions you may have.</p>
 
     <!-- Chatbot container -->
-    <div class="chatbot-container" onclick="toggleChatbot()">
-        Click here to chat with the bot
-    </div>
-
-    <!-- Chatbot iframe -->
-    <div id="chatbot-container" class="chatbot-content"></div>
-
-    <script>
-        var chatbotContainer = document.getElementById('chatbot-container');
-
-        function toggleChatbot() {
-            if (chatbotContainer.style.display === 'none') {
-                var iframe = document.createElement('iframe');
-                iframe.id = 'chatbot-iframe';
-                iframe.src = 'https://chatbotapp-86615bjdqu5.streamlit.app/';
-                iframe.frameBorder = '0';
-
-                chatbotContainer.appendChild(iframe);
-                chatbotContainer.style.display = 'block';
-            } else {
-                chatbotContainer.innerHTML = '';
-                chatbotContainer.style.display = 'none';
-            }
-        }
-    </script>
+    <a href="https://30days.streamlit.app/?embed=true" target="_blank" rel="noopener noreferrer" class="chatbot-container">
+        Click here to open the chatbot
+    </a>
 </body>
 </html>
