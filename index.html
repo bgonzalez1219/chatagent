@@ -1,60 +1,146 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Example Chatbot Work Page</title>
+    <title>Chatbot</title>
     <style>
-        /* Add some basic styling */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            text-align: center;
-        }
-
-        h1 {
-            color: #333;
-        }
-
-        p {
-            color: #666;
-        }
-
-        /* Chatbot styling */
-        .chatbot-container {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            border: 1px solid #ccc;
-            padding: 10px;
-            cursor: pointer;
-            z-index: 999;
-        }
-
-        .chatbot-content {
-            display: none;
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 400px;
-            height: 500px;
-            border: none;
-        }
-
-        #chatbot-iframe {
-            width: 100%;
-            height: 100%;
-        }
+        /* Add your custom CSS styles here */
+        /* ... */
     </style>
 </head>
 <body>
-    <h1>Example Chatbot Work Page</h1>
-    <p>Welcome to my chatbot work page!</p>
-    <p>This page demonstrates the functionality of a chatbot I developed.</p>
-    <p>Feel free to interact with the chatbot and ask any questions you may have.</p>
+    <div class="container">
+        <h1>💬 Chatbot</h1>
+        <div id="chatbox" class="chatbox"></div>
+        <input type="text" id="userInput" placeholder="User Input">
+        <button onclick="sendMessage()">Send</button>
+    </div>
 
-    <!-- Chatbot container -->
-    <a href="https://30days.streamlit.app/?embed=true" target="_blank" rel="noopener noreferrer" class="chatbot-container">
-        Click here to open the chatbot
-    </a>
+    <script>
+        // JavaScript code goes here
+
+        // Import statements and initialization
+        const openai = require('openai');
+        const fs = require('fs');
+
+        // API Key
+        const api_key = prompt("OpenAI API Key: ");
+
+        // Set the API key if provided
+        if (api_key) {
+            openai.api_key = api_key;
+        }
+
+        // Check if the API key is set
+        if (!openai.api_key) {
+            console.log("Please enter your OpenAI API key.");
+            process.exit(1);
+        }
+
+        // Load data from data1.json
+        const data1 = JSON.parse(fs.readFileSync('Metadata.json', 'utf8'));
+
+        // Load data from data2.json
+        const data2 = JSON.parse(fs.readFileSync('ICM Data.json', 'utf8'));
+
+        // Function to get API response
+        async function get_api_response(prompt) {
+            try {
+                const response = await openai.Completion.create({
+                    model: 'text-davinci-003',
+                    prompt: prompt,
+                    temperature: 0.7,
+                    max_tokens: 256,
+                    top_p: 1,
+                    frequency_penalty: 0,
+                    presence_penalty: 0.6,
+                    stop: [' Human:', ' AI:']
+                });
+                return response;
+
+            } catch (e) {
+                console.error('ERROR:', e);
+                return null;
+            }
+        }
+
+        // Function to create the prompt
+        function create_prompt(message, data1, data2) {
+            let prompt = prompt_list.join('\n') + '\n\n';
+            prompt += JSON.stringify(data1) + '\n\n';
+            prompt += JSON.stringify(data2) + '\n\n';
+            prompt += 'Human: ' + message;
+            return prompt;
+        }
+
+        // Function to get the bot response
+        async function get_bot_response(message, data1, data2) {
+            const prompt = create_prompt(message, data1, data2);
+            const response = await get_api_response(prompt);
+
+            if (response) {
+                const choices = response.choices[0];
+                const reasoning = choices.reasoning;
+
+                if (reasoning) {
+                    return [response.choices[0].text, reasoning];
+                } else {
+                    return [response.choices[0].text, null];
+                }
+            } else {
+                return ['Sorry, something went wrong...', null];
+            }
+        }
+
+        // Helper function to create and append a message element
+        function appendMessage(message, className) {
+            var messageElement = document.createElement("div");
+            messageElement.className = className;
+            messageElement.innerText = message;
+
+            var chatbox = document.getElementById("chatbox");
+            chatbox.appendChild(messageElement);
+        }
+
+        // Function to send user input and receive bot response
+        async function sendMessage() {
+            var userInput = document.getElementById("userInput").value;
+            appendMessage(userInput, "user-message");
+
+            // Process user input and get bot response
+            const [botResponse, reasoning] = await get_bot_response(userInput, data1, data2);
+
+            // Display bot response
+            appendMessage(botResponse, "bot-message");
+
+            if (reasoning) {
+                // Button to show reasoning
+                const show_reasoning = prompt("Show Reasoning? (Y/N): ");
+
+                if (show_reasoning.toLowerCase() === "y") {
+                    appendMessage("---", "data-info");
+                    appendMessage("Reasoning:", "data-info");
+                    appendMessage(reasoning, "data-info");
+                }
+            }
+
+            // Button to show data information
+            const show_data_info = prompt("Show Data Information? (Y/N): ");
+
+            if (show_data_info.toLowerCase() === "y") {
+                appendMessage("---", "data-info");
+                appendMessage("Data Information:", "data-info");
+                if (Array.isArray(data1) && Array.isArray(data2)) {
+                    appendMessage("data1.json:", "data-info");
+                    appendMessage(JSON.stringify(data1, null, 4), "data-info");
+                    appendMessage("data2.json:", "data-info");
+                    appendMessage(JSON.stringify(data2, null, 4), "data-info");
+                } else {
+                    appendMessage("Invalid data format for data1.json or data2.json", "data-info");
+                }
+            }
+
+            document.getElementById("userInput").value = "";
+        }
+    </script>
 </body>
 </html>
