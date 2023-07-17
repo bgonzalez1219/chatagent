@@ -40,7 +40,7 @@
             border: none;
         }
 
-        #chatbot-iframe {
+        #chatbot-object {
             width: 100%;
             height: 100%;
         }
@@ -57,18 +57,18 @@
         Click here to chat with the bot
     </div>
 
-    <!-- Chatbot iframe -->
+    <!-- Chatbot object -->
     <div id="chatbot-container" class="chatbot-content">
-        <iframe id="chatbot-iframe" src="" frameborder="0"></iframe>
+        <object id="chatbot-object" data="" type="text/html"></object>
     </div>
 
     <script>
-        function toggleChatbot() {
-            var chatbotContainer = document.getElementById('chatbot-container');
-            var chatbotIframe = document.getElementById('chatbot-iframe');
+        var chatbotContainer = document.getElementById('chatbot-container');
+        var chatbotObject = document.getElementById('chatbot-object');
 
+        function toggleChatbot() {
             if (chatbotContainer.style.display === 'none') {
-                chatbotIframe.src = 'https://chatbotapp-86615bjdqu5.streamlit.app/';
+                chatbotObject.data = 'https://chatbotapp-86615bjdqu5.streamlit.app/';
                 chatbotContainer.style.display = 'block';
             } else {
                 chatbotContainer.style.display = 'none';
