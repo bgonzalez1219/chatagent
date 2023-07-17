@@ -27,23 +27,22 @@
             border: 1px solid #ccc;
             padding: 10px;
             cursor: pointer;
+            z-index: 999;
         }
 
         .chatbot-content {
             display: none;
-            padding: 10px;
-            background-color: #f7f7f7;
-            border: 1px solid #ccc;
-        }
-
-        #streamlit-iframe {
             position: fixed;
             bottom: 0;
             right: 0;
+            width: 400px;
+            height: 500px;
+            border: none;
+        }
+
+        #chatbot-iframe {
             width: 100%;
             height: 100%;
-            border: none;
-            display: none;
         }
     </style>
 </head>
@@ -54,44 +53,27 @@
     <p>Feel free to interact with the chatbot and ask any questions you may have.</p>
 
     <!-- Chatbot container -->
-    <div class="chatbot-container">
+    <div class="chatbot-container" onclick="launchChatbot()">
         Click here to chat with the bot
     </div>
 
-    <!-- Chatbot content -->
-    <div class="chatbot-content">
-        <!-- Chatbot interface goes here -->
-        <input type="text" id="chat-input" placeholder="Type your message" />
-        <button id="send-btn">Send</button>
-        <div id="chat-output"></div>
+    <!-- Chatbot iframe -->
+    <div id="chatbot-container" class="chatbot-content">
+        <iframe id="chatbot-iframe" src="" frameborder="0"></iframe>
     </div>
 
-    <!-- Streamlit app iframe -->
-    <iframe id="streamlit-iframe" src="https://chatbotapp-86615bjdqu5.streamlit.app/"></iframe>
-
     <script>
-        // Chatbot functionality
-        const chatbotContainer = document.querySelector('.chatbot-container');
-        const chatbotContent = document.querySelector('.chatbot-content');
-        const chatInput = document.getElementById('chat-input');
-        const chatOutput = document.getElementById('chat-output');
-        const sendButton = document.getElementById('send-btn');
-        const streamlitIframe = document.getElementById('streamlit-iframe');
+        function launchChatbot() {
+            var chatbotContainer = document.getElementById('chatbot-container');
+            var chatbotIframe = document.getElementById('chatbot-iframe');
 
-        chatbotContainer.addEventListener('click', function () {
-            chatbotContainer.style.display = 'none';
-            chatbotContent.style.display = 'block';
-            streamlitIframe.style.display = 'block';
-        });
-
-        sendButton.addEventListener('click', function () {
-            const userMessage = chatInput.value;
-            // Handle user message and generate chatbot response
-            const chatbotResponse = 'This is a sample chatbot response';
-            chatOutput.innerHTML += '<p><strong>User:</strong> ' + userMessage + '</p>';
-            chatOutput.innerHTML += '<p><strong>Chatbot:</strong> ' + chatbotResponse + '</p>';
-            chatInput.value = '';
-        });
+            if (chatbotIframe.src === "") {
+                chatbotIframe.src = "https://30days.streamlit.app/?embed=true";
+                chatbotContainer.style.display = "block";
+            } else {
+                chatbotContainer.style.display = chatbotContainer.style.display === "none" ? "block" : "none";
+            }
+        }
     </script>
 </body>
 </html>
