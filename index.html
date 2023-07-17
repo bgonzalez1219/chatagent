@@ -33,8 +33,8 @@
         .chatbot-content {
             display: none;
             position: fixed;
-            bottom: 0;
-            right: 0;
+            bottom: 20px;
+            right: 20px;
             width: 400px;
             height: 500px;
             border: none;
@@ -53,7 +53,7 @@
     <p>Feel free to interact with the chatbot and ask any questions you may have.</p>
 
     <!-- Chatbot container -->
-    <div class="chatbot-container" onclick="launchChatbot()">
+    <div class="chatbot-container" onclick="toggleChatbot()">
         Click here to chat with the bot
     </div>
 
@@ -63,15 +63,15 @@
     </div>
 
     <script>
-        function launchChatbot() {
+        function toggleChatbot() {
             var chatbotContainer = document.getElementById('chatbot-container');
             var chatbotIframe = document.getElementById('chatbot-iframe');
 
-            if (chatbotIframe.src === "") {
-                chatbotIframe.src = "https://chatbotapp-86615bjdqu5.streamlit.app/";
-                chatbotContainer.style.display = "block";
+            if (chatbotContainer.style.display === 'none') {
+                chatbotIframe.src = 'https://chatbotapp-86615bjdqu5.streamlit.app/';
+                chatbotContainer.style.display = 'block';
             } else {
-                chatbotContainer.style.display = chatbotContainer.style.display === "none" ? "block" : "none";
+                chatbotContainer.style.display = 'none';
             }
         }
     </script>
