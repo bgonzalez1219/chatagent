@@ -35,6 +35,10 @@
             background-color: #f7f7f7;
             border: 1px solid #ccc;
         }
+
+        #streamlit-iframe {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -55,7 +59,7 @@
     </div>
 
     <!-- Streamlit app iframe -->
-    <iframe src="https://chatbotapp-86615bjdqu5.streamlit.app/" height="450" style="width:100%;border:none;"></iframe>
+    <iframe id="streamlit-iframe" src="https://30days.streamlit.app/?embed=true" height="450" style="width:100%;border:none;"></iframe>
 
     <script>
         // Chatbot functionality
@@ -64,9 +68,11 @@
         const chatInput = document.getElementById('chat-input');
         const chatOutput = document.getElementById('chat-output');
         const sendButton = document.getElementById('send-btn');
+        const streamlitIframe = document.getElementById('streamlit-iframe');
 
         chatbotContainer.addEventListener('click', function () {
             chatbotContent.style.display = chatbotContent.style.display === 'none' ? 'block' : 'none';
+            streamlitIframe.style.display = streamlitIframe.style.display === 'none' ? 'block' : 'none';
         });
 
         sendButton.addEventListener('click', function () {
