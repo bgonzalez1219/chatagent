@@ -15,110 +15,29 @@
         <button onclick="sendMessage()">Send</button>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/openai/dist/openai.min.js"></script>
     <script>
         // JavaScript code goes here
 
-        // API Key
-        var api_key = "YOUR_API_KEY"; // Replace with your actual API key
+        // Function to send user input and receive bot response
+        async function sendMessage() {
+            var userInput = document.getElementById("userInput").value;
+            appendMessage(userInput, "user-message");
 
-        // Load data from data1.json
-        fetch('https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPOSITORY/main/Metadata.json')
-            .then(response => response.json())
-            .then(data1 => {
-                // Load data from data2.json
-                fetch('https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPOSITORY/main/ICM%20Data.json')
-                    .then(response => response.json())
-                    .then(data2 => {
-                        initializeChatbot(data1, data2);
-                    })
-                    .catch(error => console.error('Error loading data2.json:', error));
-            })
-            .catch(error => console.error('Error loading data1.json:', error));
+            // Make a POST request to the chat endpoint of your Flask server
+            var response = await fetch('https://raw.githubusercontent.com/bgonzalez1219/chategent/main/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    user_input: userInput
+                })
+            });
 
-        // Prompt list
-        var prompt_list = [
-            "You are a friendly AI assistant that helps answer questions based on data from JSON files.",
-            "",
-            "What you are able to do:",
-            "- Answer general conversation questions such as 'How are you?'",
-            "- Provide information based on the data in the JSON files",
-            "- Answer questions related to the available keys in the JSON files",
-            "",
-            "What you are not able to do:",
-            "- Provide information that is not present in the JSON files",
-            "- Answer questions that are not related to the available keys in the JSON files",
-            "- Provide rude or vulgar responses"
-        ];
-
-        // Function to initialize the chatbot
-        function initializeChatbot(data1, data2) {
-            // Function to get API response
-            async function get_api_response(prompt) {
-                try {
-                    var response = await openai.Completion.create({
-                        model: 'text-davinci-003',
-                        prompt: prompt,
-                        temperature: 0.7,
-                        max_tokens: 256,
-                        top_p: 1,
-                        frequency_penalty: 0,
-                        presence_penalty: 0.6,
-                        stop: [' Human:', ' AI:']
-                    });
-                    return response;
-
-                } catch (e) {
-                    console.error('ERROR:', e);
-                    return null;
-                }
-            }
-
-            // Function to create the prompt
-            function create_prompt(message, data1, data2) {
-                var prompt = prompt_list.join('\n') + '\n\n';
-                prompt += JSON.stringify(data1) + '\n\n';
-                prompt += JSON.stringify(data2) + '\n\n';
-                prompt += 'Human: ' + message;
-                return prompt;
-            }
-
-            // Function to get the bot response
-            async function get_bot_response(message, data1, data2) {
-                var prompt = create_prompt(message, data1, data2);
-                var response = await get_api_response(prompt);
-
-                if (response) {
-                    var choices = response.choices[0];
-                    var reasoning = choices.reasoning;
-
-                    if (reasoning) {
-                        return [response.choices[0].text, reasoning];
-                    } else {
-                        return [response.choices[0].text, null];
-                    }
-                } else {
-                    return ['Sorry, something went wrong...', null];
-                }
-            }
-
-            // Helper function to create and append a message element
-            function appendMessage(message, className) {
-                var messageElement = document.createElement("div");
-                messageElement.className = className;
-                messageElement.innerHTML = message;
-
-                var chatbox = document.getElementById("chatbox");
-                chatbox.appendChild(messageElement);
-            }
-
-            // Function to send user input and receive bot response
-            async function sendMessage() {
-                var userInput = document.getElementById("userInput").value;
-                appendMessage(userInput, "user-message");
-
-                // Process user input and get bot response
-                var [botResponse, reasoning] = await get_bot_response(userInput, data1, data2);
+            if (response.ok) {
+                var data = await response.json();
+                var botResponse = data.bot_response;
+                var reasoning = data.reasoning;
 
                 // Display bot response
                 appendMessage(botResponse, "bot-message");
@@ -149,9 +68,21 @@
                         appendMessage("Invalid data format for data1.json or data2.json", "data-info");
                     }
                 }
-
-                document.getElementById("userInput").value = "";
+            } else {
+                console.error('Error:', response.status);
             }
+
+            document.getElementById("userInput").value = "";
+        }
+
+        // Helper function to create and append a message element
+        function appendMessage(message, className) {
+            var messageElement = document.createElement("div");
+            messageElement.className = className;
+            messageElement.innerHTML = message;
+
+            var chatbox = document.getElementById("chatbox");
+            chatbox.appendChild(messageElement);
         }
     </script>
 </body>
