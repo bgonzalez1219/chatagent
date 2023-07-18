@@ -15,6 +15,7 @@
         <button onclick="sendMessage()">Send</button>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/openai/dist/openai.min.js"></script>
     <script>
         // JavaScript code goes here
 
@@ -22,11 +23,11 @@
         var api_key = "YOUR_API_KEY"; // Replace with your actual API key
 
         // Load data from data1.json
-        fetch('./Metadata.json')
+        fetch('https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPOSITORY/main/Metadata.json')
             .then(response => response.json())
             .then(data1 => {
                 // Load data from data2.json
-                fetch('./ICM Data.json')
+                fetch('https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPOSITORY/main/ICM%20Data.json')
                     .then(response => response.json())
                     .then(data2 => {
                         initializeChatbot(data1, data2);
