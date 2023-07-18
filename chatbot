@@ -1,0 +1,92 @@
+import openai
+import json
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+
+# Your existing code ...
+
+# Set the OpenAI API key
+api_key = "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"
+openai.api_key = api_key
+
+# Check if the API key is set
+if not openai.api_key:
+    print("Please enter your OpenAI API key.")
+    exit(1)
+
+# Load data from data1.json
+with open('Metadata.json', 'r') as file:
+    data1 = json.load(file)
+
+# Load data from data2.json
+with open('ICM Data.json', 'r') as file:
+    data2 = json.load(file)
+
+# Prompt list
+prompt_list = [
+    "You are a friendly AI assistant that helps answer questions based on data from JSON files.",
+    "",
+    "What you are able to do:",
+    "- Answer general conversation questions such as 'How are you?'",
+    "- Provide information based on the data in the JSON files",
+    "- Answer questions related to the available keys in the JSON files",
+    "",
+    "What you are not able to do:",
+    "- Provide information that is not present in the JSON files",
+    "- Answer questions that are not related to the available keys in the JSON files",
+    "- Provide rude or vulgar responses"
+]
+
+def get_api_response(prompt):
+    try:
+        response = openai.Completion.create(
+            model='text-davinci-003',
+            prompt=prompt,
+            temperature=0.7,
+            max_tokens=256,
+            top_p=1,
+            frequency_penalty=0,
+            presence_penalty=0.6,
+            stop=[' Human:', ' AI:']
+        )
+
+        return response
+
+    except Exception as e:
+        print('ERROR:', e)
+        return None
+
+def create_prompt(message, data1, data2):
+    prompt = '\n'.join(prompt_list) + '\n\n'
+    prompt += json.dumps(data1) + '\n\n'
+    prompt += json.dumps(data2) + '\n\n'
+    prompt += 'Human: ' + message
+
+    return prompt
+
+def get_bot_response(message, data1, data2):
+    prompt = create_prompt(message, data1, data2)
+    response = get_api_response(prompt)
+
+    if response:
+        choices = response.choices[0]
+        reasoning = choices.get('reasoning')
+
+        if reasoning:
+            return response.choices[0].text, reasoning
+        else:
+            return response.choices[0].text, None
+    else:
+        return 'Sorry, something went wrong...', None
+
+@app.route('/chat', methods=['POST'])
+def chat():
+    data = request.get_json()
+    user_input = data['user_input']
+    bot_response, reasoning = get_bot_response(user_input, data1, data2)
+    response = {'bot_response': bot_response, 'reasoning': reasoning}
+    return jsonify(response)
+
+if __name__ == '__main__':
+    app.run()
